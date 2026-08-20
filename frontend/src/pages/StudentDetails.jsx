@@ -1,0 +1,1037 @@
+import {
+    useEffect,
+    useState
+} from "react";
+
+import {
+    Link,
+    useNavigate,
+    useParams
+} from "react-router-dom";
+
+import api from "../services/api";
+
+
+function StudentDetails() {
+
+    // ==========================================
+    // URL PARAMETER
+    // ==========================================
+
+    const { id } = useParams();
+
+    const navigate =
+        useNavigate();
+
+
+    // ==========================================
+    // STATES
+    // ==========================================
+
+    const [
+        student,
+        setStudent
+    ] = useState(null);
+
+
+    const [
+        loading,
+        setLoading
+    ] = useState(true);
+
+
+    const [
+        error,
+        setError
+    ] = useState("");
+
+
+    const [
+        deleting,
+        setDeleting
+    ] = useState(false);
+
+
+    // ==========================================
+    // LOAD STUDENT
+    // ==========================================
+
+    useEffect(() => {
+
+        if (!id) {
+
+            setError(
+                "Student ID is missing."
+            );
+
+            setLoading(false);
+
+            return;
+
+        }
+
+
+        loadStudent();
+
+    }, [id]);
+
+
+    // ==========================================
+    // GET STUDENT
+    // ==========================================
+
+    async function loadStudent() {
+
+        try {
+
+            setLoading(true);
+
+            setError("");
+
+
+            const response =
+                await api.get(
+                    `/students/${id}`
+                );
+
+
+            console.log(
+                "Student details:",
+                response.data
+            );
+
+
+            const studentData =
+
+                response.data?.student ||
+
+                response.data?.data ||
+
+                response.data;
+
+
+            if (
+                !studentData ||
+                !studentData.id
+            ) {
+
+                throw new Error(
+                    "Student information was not returned."
+                );
+
+            }
+
+
+            setStudent(
+                studentData
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Load student error:",
+                error
+            );
+
+
+            setError(
+
+                error.response?.data?.message ||
+
+                error.message ||
+
+                "Student not found."
+
+            );
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    }
+
+
+    // ==========================================
+    // DELETE STUDENT
+    // ==========================================
+
+    async function handleDelete() {
+
+        if (!student) {
+
+            return;
+
+        }
+
+
+        const confirmed =
+            window.confirm(
+
+                `Are you sure you want to delete ${student.full_name}?`
+
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            setDeleting(true);
+
+            setError("");
+
+
+            await api.delete(
+                `/students/${student.id}`
+            );
+
+
+            alert(
+                "Student deleted successfully."
+            );
+
+
+            navigate(
+                "/admin/students"
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Delete student error:",
+                error
+            );
+
+
+            setError(
+
+                error.response?.data?.message ||
+
+                "Unable to delete student."
+
+            );
+
+        } finally {
+
+            setDeleting(false);
+
+        }
+
+    }
+
+
+    // ==========================================
+    // LOADING
+    // ==========================================
+
+    if (loading) {
+
+        return (
+
+            <main className="page">
+
+                <div className="student-loading">
+
+                    <div className="loading-spinner"></div>
+
+                    <p>
+
+                        Loading student profile...
+
+                    </p>
+
+                </div>
+
+            </main>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // ERROR
+    // ==========================================
+
+    if (
+        error &&
+        !student
+    ) {
+
+        return (
+
+            <main className="page">
+
+                <div className="error">
+
+                    {error}
+
+                </div>
+
+
+                <Link
+                    to="/admin/students"
+                    className="btn secondary"
+                >
+
+                    ← Back to Students
+
+                </Link>
+
+            </main>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // PAGE
+    // ==========================================
+
+    return (
+
+        <main className="page">
+
+
+            {/* ======================================
+                HEADER
+            ====================================== */}
+
+            <div className="student-details-header">
+
+
+                <div>
+
+                    <Link
+                        to="/admin/students"
+                        className="public-back-link"
+                    >
+
+                        ← Back to Students
+
+                    </Link>
+
+
+                    <span className="eyebrow">
+
+                        ADMIN / STUDENT PROFILE
+
+                    </span>
+
+
+                    <h1>
+
+                        Student Profile
+
+                    </h1>
+
+
+                    <p>
+
+                        View complete student
+                        information and academic details.
+
+                    </p>
+
+                </div>
+
+
+                {/* ==================================
+                    ADMIN ACTIONS
+                ================================== */}
+
+                <div className="student-header-actions">
+
+
+                    {/* EDIT */}
+
+                    <Link
+                        to={`/admin/students/edit/${student.id}`}
+                        className="btn primary"
+                    >
+
+                        ✏️ Edit Student
+
+                    </Link>
+
+
+                    {/* DELETE */}
+
+                    <button
+                        type="button"
+                        className="btn danger"
+                        onClick={
+                            handleDelete
+                        }
+                        disabled={
+                            deleting
+                        }
+                    >
+
+                        {deleting
+
+                            ? "Deleting..."
+
+                            : "Delete Student"
+
+                        }
+
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+
+            {/* ======================================
+                ERROR
+            ====================================== */}
+
+            {error && (
+
+                <div className="error">
+
+                    {error}
+
+                </div>
+
+            )}
+
+
+            {/* ======================================
+                PROFILE HERO
+            ====================================== */}
+
+            <section className="student-profile-hero">
+
+
+                {/* AVATAR */}
+
+                <div className="student-large-avatar">
+
+
+                    {student.profile_image ? (
+
+                        <img
+                            src={
+                                student.profile_image
+                            }
+                            alt={
+                                student.full_name
+                            }
+                        />
+
+                    ) : (
+
+                        <span>
+
+                            {
+                                student.full_name
+                                    ?.charAt(0)
+                                    ?.toUpperCase()
+                            }
+
+                        </span>
+
+                    )}
+
+                </div>
+
+
+                {/* STUDENT NAME */}
+
+                <div className="student-hero-info">
+
+
+                    <span className="eyebrow">
+
+                        STUDENT
+
+                    </span>
+
+
+                    <h1>
+
+                        {
+                            student.full_name ||
+                            "Unnamed Student"
+                        }
+
+                    </h1>
+
+
+                    <p className="student-course-title">
+
+                        {
+                            student.course_name ||
+                            student.batch_course_name ||
+                            "Course not available"
+                        }
+
+                    </p>
+
+
+                    <div className="student-quick-tags">
+
+
+                        {student.batch_name && (
+
+                            <span className="student-tag">
+
+                                🎓{" "}
+
+                                {
+                                    student.batch_name
+                                }
+
+                            </span>
+
+                        )}
+
+
+                        {student.current_year && (
+
+                            <span className="student-tag">
+
+                                📚 Year{" "}
+
+                                {
+                                    student.current_year
+                                }
+
+                            </span>
+
+                        )}
+
+
+                        {student.semester && (
+
+                            <span className="student-tag">
+
+                                📖 Semester{" "}
+
+                                {
+                                    student.semester
+                                }
+
+                            </span>
+
+                        )}
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+            {/* ======================================
+                IMPORTANT INFORMATION
+            ====================================== */}
+
+            <section className="important-student-info">
+
+
+                {/* EMAIL */}
+
+                <div className="important-info-card">
+
+
+                    <div className="important-info-icon">
+
+                        ✉️
+
+                    </div>
+
+
+                    <div className="important-info-content">
+
+                        <span>
+
+                            EMAIL ADDRESS
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.email ||
+                                "Not provided"
+                            }
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                {/* ENROLLMENT */}
+
+                <div className="important-info-card">
+
+
+                    <div className="important-info-icon">
+
+                        🆔
+
+                    </div>
+
+
+                    <div className="important-info-content">
+
+                        <span>
+
+                            ENROLLMENT NUMBER
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.enrollment_number ||
+                                "Not provided"
+                            }
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                {/* BATCH */}
+
+                <div className="important-info-card batch-info-card">
+
+
+                    <div className="important-info-icon">
+
+                        🎓
+
+                    </div>
+
+
+                    <div className="important-info-content">
+
+                        <span>
+
+                            BATCH
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.batch_name ||
+                                "No Batch"
+                            }
+
+                        </strong>
+
+
+                        {(student.batch_year ||
+                            student.duration_years) && (
+
+                            <small>
+
+                                {
+                                    student.batch_year
+                                        ? student.batch_year
+                                        : ""
+                                }
+
+                                {student.batch_year &&
+                                    student.duration_years
+                                    ? " • "
+                                    : ""}
+
+                                {
+                                    student.duration_years
+                                        ? `${student.duration_years} years`
+                                        : ""
+                                }
+
+                            </small>
+
+                        )}
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            {/* ======================================
+                PERSONAL INFORMATION
+            ====================================== */}
+
+            <section className="student-info-section">
+
+
+                <div className="section-heading">
+
+
+                    <span className="eyebrow">
+
+                        PERSONAL INFORMATION
+
+                    </span>
+
+
+                </div>
+
+
+                <div className="student-detail-grid">
+
+
+                    {/* FULL NAME */}
+
+                    <div className="student-detail-item">
+
+                        <span>
+
+                            Full Name
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.full_name ||
+                                "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* PHONE */}
+
+                    <div className="student-detail-item">
+
+                        <span>
+
+                            Phone
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.phone ||
+                                "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* GENDER */}
+
+                    <div className="student-detail-item">
+
+                        <span>
+
+                            Gender
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.gender ||
+                                "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* BRANCH */}
+
+                    <div className="student-detail-item">
+
+                        <span>
+
+                            Branch
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.branch ||
+                                "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+            {/* ======================================
+                ACADEMIC INFORMATION
+            ====================================== */}
+
+            <section className="student-info-section">
+
+
+                <div className="section-heading">
+
+
+                    <span className="eyebrow">
+
+                        ACADEMIC INFORMATION
+
+                    </span>
+
+
+                </div>
+
+
+                <div className="academic-detail-grid">
+
+
+                    {/* COURSE */}
+
+                    <div className="academic-card">
+
+                        <span>
+
+                            COURSE
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.course_name ||
+                                student.batch_course_name ||
+                                "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* BATCH */}
+
+                    <div className="academic-card">
+
+                        <span>
+
+                            BATCH
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.batch_name ||
+                                "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* ADMISSION YEAR */}
+
+                    <div className="academic-card">
+
+                        <span>
+
+                            ADMISSION YEAR
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.admission_year ||
+                                "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* CURRENT YEAR */}
+
+                    <div className="academic-card">
+
+                        <span>
+
+                            ACADEMIC YEAR
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.current_year
+                                    ? `Year ${student.current_year}`
+                                    : "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* SEMESTER */}
+
+                    <div className="academic-card">
+
+                        <span>
+
+                            SEMESTER
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.semester
+                                    ? `Semester ${student.semester}`
+                                    : "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* DURATION */}
+
+                    <div className="academic-card">
+
+                        <span>
+
+                            COURSE DURATION
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.duration_years
+                                    ? `${student.duration_years} years`
+                                    : "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                    {/* GRADUATION */}
+
+                    <div className="academic-card">
+
+                        <span>
+
+                            EXPECTED GRADUATION
+
+                        </span>
+
+
+                        <strong>
+
+                            {
+                                student.expected_graduation_year ||
+                                "—"
+                            }
+
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+            {/* ======================================
+                BOTTOM ACTIONS
+            ====================================== */}
+
+            <div className="student-bottom-actions">
+
+
+                <Link
+                    to="/admin/students"
+                    className="btn secondary"
+                >
+
+                    ← Back to Students
+
+                </Link>
+
+
+                <Link
+                    to={`/admin/students/edit/${student.id}`}
+                    className="btn primary"
+                >
+
+                    ✏️ Edit Student
+
+                </Link>
+
+
+            </div>
+
+
+        </main>
+
+    );
+
+}
+
+
+export default StudentDetails;
