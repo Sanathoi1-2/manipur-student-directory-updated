@@ -51,7 +51,7 @@ const app = express();
 // http://localhost:5174
 //
 // Production frontend:
-// https://manipur-student-directory-updated-a.vercel.app
+// https://manipur-student-directory-updated-1.vercel.app
 //
 // IMPORTANT:
 // If your Vercel URL changes, add the new URL here.
@@ -72,7 +72,7 @@ const allowedOrigins = [
     // PRODUCTION - VERCEL
     // ==========================================
 
-    "https://manipur-student-directory-updated-a.vercel.app"
+    "https://manipur-student-directory-updated-1.vercel.app"
 
 ];
 
