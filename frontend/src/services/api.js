@@ -9,7 +9,7 @@ import axios from "axios";
 // VITE_API_URL=http://localhost:5000/api
 //
 // PRODUCTION:
-// VITE_API_URL=https://manipur-student-directory-updated-2.onrender.com/api
+// VITE_API_URL=https://manipur-student-directory-updated-1.onrender.com/api
 //
 // If VITE_API_URL is not defined, localhost is used.
 // =========================================================
@@ -59,7 +59,7 @@ api.interceptors.request.use(
         // Do not force application/json when sending
         // FormData.
         //
-        // The browser must automatically create the
+        // The browser automatically creates the
         // multipart/form-data boundary.
         //
 
