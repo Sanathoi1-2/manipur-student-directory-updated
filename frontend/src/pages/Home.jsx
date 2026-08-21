@@ -432,7 +432,7 @@ function Home() {
 
                     <p>
 
-                        Find the and connect with
+                        Find and connect with
                         students from Manipur
                         studying at Parul University,
                         organized batch-by-batch
