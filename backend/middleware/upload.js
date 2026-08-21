@@ -1,80 +1,16 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-
 
 // =====================================================
-// UPLOAD DIRECTORY
+// MEMORY STORAGE
+// =====================================================
+//
+// The image is temporarily stored in memory.
+// studentController.js then sends req.file.buffer
+// to Cloudinary.
+//
 // =====================================================
 
-const uploadDirectory = path.join(
-    __dirname,
-    "../uploads/students"
-);
-
-
-// =====================================================
-// CREATE DIRECTORY IF NOT EXISTS
-// =====================================================
-
-if (!fs.existsSync(uploadDirectory)) {
-
-    fs.mkdirSync(
-        uploadDirectory,
-        {
-            recursive: true
-        }
-    );
-
-}
-
-
-// =====================================================
-// STORAGE
-// =====================================================
-
-const storage = multer.diskStorage({
-
-    destination: function (
-        req,
-        file,
-        cb
-    ) {
-
-        cb(
-            null,
-            uploadDirectory
-        );
-
-    },
-
-
-    filename: function (
-        req,
-        file,
-        cb
-    ) {
-
-        const extension =
-            path.extname(
-                file.originalname
-            ).toLowerCase();
-
-
-        const uniqueName =
-            `student-${Date.now()}-${Math.round(
-                Math.random() * 100000
-            )}${extension}`;
-
-
-        cb(
-            null,
-            uniqueName
-        );
-
-    }
-
-});
+const storage = multer.memoryStorage();
 
 
 // =====================================================
@@ -137,6 +73,7 @@ const upload = multer({
 
     limits: {
 
+        // Maximum image size: 5 MB
         fileSize:
             5 * 1024 * 1024
 
@@ -144,5 +81,9 @@ const upload = multer({
 
 });
 
+
+// =====================================================
+// EXPORT
+// =====================================================
 
 module.exports = upload;
