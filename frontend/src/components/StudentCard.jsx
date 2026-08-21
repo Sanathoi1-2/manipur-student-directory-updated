@@ -14,64 +14,89 @@ function StudentCard({
             className="student-card"
         >
 
-            <div className="student-avatar">
+            {/* ==============================
+                PROFILE IMAGE
+            ============================== */}
 
-                {student.profile_image ? (
+            <div className="student-card-image">
 
-                    <img
-                        src={
-                            student.profile_image
-                        }
-                        alt={
-                            student.full_name
-                        }
-                    />
+                <div className="student-avatar">
 
-                ) : (
+                    {student.profile_image ? (
 
-                    <span>
-                        {
-                            student.full_name
+                        <img
+                            src={student.profile_image}
+                            alt={student.full_name}
+                        />
+
+                    ) : (
+
+                        <span>
+                            {student.full_name
                                 ?.charAt(0)
-                                ?.toUpperCase()
-                        }
-                    </span>
+                                ?.toUpperCase()}
+                        </span>
 
-                )}
+                    )}
+
+                </div>
 
             </div>
 
+
+            {/* ==============================
+                STUDENT INFORMATION
+            ============================== */}
 
             <div className="student-info">
 
-                <h3>
-                    {student.full_name}
-                </h3>
+                <div className="student-name-row">
 
-                <p>
+                    <h3>
+                        {student.full_name}
+                    </h3>
+
+                    <span className="student-arrow">
+                        →
+                    </span>
+
+                </div>
+
+
+                <p className="student-course">
                     {student.course_name}
                 </p>
 
-                <p>
-                    {
-                        student.enrollment_number
-                    }
-                </p>
+
+                <div className="student-enrollment">
+
+                    <span className="enrollment-label">
+                        Enrollment
+                    </span>
+
+                    <span className="enrollment-number">
+                        {student.enrollment_number}
+                    </span>
+
+                </div>
 
             </div>
 
+
+            {/* ==============================
+                STUDENT META
+            ============================== */}
 
             <div className="student-meta">
 
                 <span className="year-badge">
 
-                    Year{" "}
-                    {student.current_year}
+                    Year {student.current_year}
 
                 </span>
 
 
-                <span>
+                <span className="student-batch">
 
                     {student.batch_name}
 
