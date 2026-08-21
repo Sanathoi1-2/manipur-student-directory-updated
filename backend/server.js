@@ -34,13 +34,11 @@ const announcementRoutes =
 const auditRoutes =
     require("./routes/auditRoutes");
 
-
 // ==========================================
 // APP
 // ==========================================
 
 const app = express();
-
 
 // ==========================================
 // CORS
@@ -50,12 +48,15 @@ const app = express();
 // http://localhost:5173
 // http://localhost:5174
 //
-// Vercel:
+// Main Vercel frontend:
+// https://parulmanipurstudent.vercel.app
+//
+// Old Vercel frontend:
+// https://manipur-student-directory-updated-n.vercel.app
+//
+// Vercel preview deployments:
 // https://manipur-student-directory-updated-*.vercel.app
 //
-// IMPORTANT:
-// This allows your Vercel preview/deployment URLs
-// without needing to change CLIENT_URL every time.
 // ==========================================
 
 const allowedOrigins = [
@@ -66,10 +67,21 @@ const allowedOrigins = [
 
     "http://localhost:5173",
 
-    "http://localhost:5174"
+    "http://localhost:5174",
+
+    // ==========================================
+    // NEW MAIN VERCEL DOMAIN
+    // ==========================================
+
+    "https://parulmanipurstudent.vercel.app",
+
+    // ==========================================
+    // OLD VERCEL DOMAIN
+    // ==========================================
+
+    "https://manipur-student-directory-updated-n.vercel.app"
 
 ];
-
 
 // ==========================================
 // CORS MIDDLEWARE
@@ -103,9 +115,8 @@ app.use(
 
             }
 
-
             // ==========================================
-            // ALLOW LOCALHOST
+            // ALLOW EXACT DOMAINS
             // ==========================================
 
             if (
@@ -114,6 +125,11 @@ app.use(
                 )
             ) {
 
+                console.log(
+                    "CORS ALLOWED ORIGIN:",
+                    origin
+                );
+
                 return callback(
                     null,
                     true
@@ -121,9 +137,8 @@ app.use(
 
             }
 
-
             // ==========================================
-            // ALLOW VERCEL DEPLOYMENTS
+            // ALLOW OLD VERCEL PREVIEW DEPLOYMENTS
             // ==========================================
             //
             // Example:
@@ -132,8 +147,7 @@ app.use(
             //
             // https://manipur-student-directory-updated-83rl-8poye71d9.vercel.app
             //
-            // https://manipur-student-directory-updated-83rl-bc61mjv0h.vercel.app
-            //
+            // ==========================================
 
             if (
 
@@ -150,7 +164,7 @@ app.use(
             ) {
 
                 console.log(
-                    "CORS ALLOWED ORIGIN:",
+                    "CORS ALLOWED VERCEL PREVIEW:",
                     origin
                 );
 
@@ -161,7 +175,6 @@ app.use(
 
             }
 
-
             // ==========================================
             // BLOCK UNKNOWN ORIGIN
             // ==========================================
@@ -170,7 +183,6 @@ app.use(
                 "CORS BLOCKED ORIGIN:",
                 origin
             );
-
 
             return callback(
 
@@ -188,7 +200,6 @@ app.use(
 
 );
 
-
 // ==========================================
 // HELMET
 // ==========================================
@@ -200,7 +211,6 @@ app.use(
         }
     })
 );
-
 
 // ==========================================
 // JSON
@@ -215,7 +225,6 @@ app.use(
     })
 
 );
-
 
 // ==========================================
 // STUDENT PROFILE IMAGE UPLOADS
@@ -235,7 +244,6 @@ app.use(
     )
 
 );
-
 
 // ==========================================
 // ROOT ROUTE
@@ -271,7 +279,6 @@ app.get(
 
 );
 
-
 // ==========================================
 // HEALTH CHECK
 // ==========================================
@@ -301,7 +308,6 @@ app.get(
 
 );
 
-
 // ==========================================
 // AUTH
 // ==========================================
@@ -322,7 +328,6 @@ app.use(
 
 );
 
-
 // ==========================================
 // STUDENTS
 // ==========================================
@@ -334,7 +339,6 @@ app.use(
     studentRoutes
 
 );
-
 
 // ==========================================
 // BATCHES
@@ -348,7 +352,6 @@ app.use(
 
 );
 
-
 // ==========================================
 // DASHBOARD
 // ==========================================
@@ -360,7 +363,6 @@ app.use(
     dashboardRoutes
 
 );
-
 
 // ==========================================
 // COMMUNITY
@@ -374,7 +376,6 @@ app.use(
 
 );
 
-
 // ==========================================
 // EVENTS
 // ==========================================
@@ -386,7 +387,6 @@ app.use(
     eventRoutes
 
 );
-
 
 // ==========================================
 // ANNOUNCEMENTS
@@ -400,7 +400,6 @@ app.use(
 
 );
 
-
 // ==========================================
 // AUDIT LOGS
 // ==========================================
@@ -412,7 +411,6 @@ app.use(
     auditRoutes
 
 );
-
 
 // ==========================================
 // 404
@@ -432,7 +430,6 @@ app.use(
             req.originalUrl
         );
 
-
         res.status(404).json({
 
             message:
@@ -443,7 +440,6 @@ app.use(
     }
 
 );
-
 
 // ==========================================
 // GLOBAL ERROR HANDLER
@@ -457,7 +453,6 @@ app.use(
             "GLOBAL ERROR:",
             error
         );
-
 
         // ==========================================
         // CORS ERROR
@@ -477,7 +472,6 @@ app.use(
 
         }
 
-
         // ==========================================
         // GENERAL ERROR
         // ==========================================
@@ -493,7 +487,6 @@ app.use(
 
 );
 
-
 // ==========================================
 // START SERVER
 // ==========================================
@@ -503,13 +496,11 @@ const PORT =
         process.env.PORT || 5000
     );
 
-
 async function startServer() {
 
     try {
 
         await getDB();
-
 
         app.listen(
 
@@ -582,6 +573,5 @@ async function startServer() {
     }
 
 }
-
 
 startServer();
