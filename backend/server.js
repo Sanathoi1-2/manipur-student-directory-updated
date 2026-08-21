@@ -194,7 +194,11 @@ app.use(
 // ==========================================
 
 app.use(
-    helmet()
+    helmet({
+        crossOriginResourcePolicy: {
+            policy: "cross-origin"
+        }
+    })
 );
 
 
