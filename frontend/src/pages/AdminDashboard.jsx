@@ -75,10 +75,6 @@ function AdminDashboard() {
             setError("");
 
 
-            // ======================================
-            // LOAD STATS + BATCHES
-            // ======================================
-
             const [
                 statsResponse,
                 batchesResponse
@@ -94,10 +90,6 @@ function AdminDashboard() {
 
             ]);
 
-
-            // ======================================
-            // DEBUG
-            // ======================================
 
             console.log(
                 "Dashboard stats response:",
@@ -207,11 +199,15 @@ function AdminDashboard() {
 
         return (
 
-            <main className="page">
+            <main className="admin-dashboard-page">
 
-                <div className="empty">
+                <div className="admin-dashboard-loading">
 
-                    Loading dashboard...
+                    <div className="modern-loading-spinner"></div>
+
+                    <p>
+                        Loading dashboard...
+                    </p>
 
                 </div>
 
@@ -223,223 +219,290 @@ function AdminDashboard() {
 
 
     // ==========================================
+    // STATS VALUES
+    // ==========================================
+
+    const totalStudents =
+        stats?.total_students ??
+        stats?.students ??
+        0;
+
+
+    const totalBatches =
+        stats?.total_batches ??
+        stats?.batches ??
+        batches.length;
+
+
+    const totalCourses =
+        stats?.total_courses ??
+        stats?.courses ??
+        0;
+
+
+    // ==========================================
     // PAGE
     // ==========================================
 
     return (
 
-        <main className="page">
+        <main className="admin-dashboard-page">
 
 
-            {/* =====================================
-                HEADER
-            ===================================== */}
+            {/* ======================================
+                TOP HEADER
+            ====================================== */}
 
-            <div className="dashboard-header">
+            <section className="admin-dashboard-hero">
 
 
-                <div>
+                <div className="admin-dashboard-hero-content">
 
-                    <span className="eyebrow">
+                    <div className="admin-dashboard-label">
 
-                        ADMIN DASHBOARD
+                        <span className="admin-status-dot"></span>
 
-                    </span>
+                        ADMIN CONTROL CENTER
+
+                    </div>
 
 
                     <h1>
 
-                        Hello,{" "}
+                        Welcome back,{" "}
 
-                        {user?.name ||
-                            user?.full_name ||
-                            "Admin"}
+                        <span>
+                            {
+                                user?.name ||
+                                user?.full_name ||
+                                "Admin"
+                            }
+                        </span>
 
                     </h1>
 
 
                     <p>
 
-                        Manage the Manipur
-                        student directory.
+                        Manage students, batches, courses
+                        and your university directory from
+                        one place.
 
                     </p>
 
                 </div>
 
 
-                {/* =================================
-                    ADMIN ACTIONS
-                ================================= */}
-
-                <div className="dashboard-actions">
-
+                <div className="admin-dashboard-hero-action">
 
                     <Link
                         to="/admin/students"
-                        className="btn primary"
+                        className="modern-primary-button"
                     >
 
-                        Manage Students
+                        <span>
+                            + Add Student
+                        </span>
 
                     </Link>
-
-
-                    <Link
-                        to="/admin/batches"
-                        className="btn secondary"
-                    >
-
-                        Manage Batches
-
-                    </Link>
-
-                    <Link
-                        to="/admin/events"
-                        className="btn secondary"
-                    >
-
-                        Manage Events
-
-                    </Link>
-
-                    <Link
-                        to="/admin/announcements"
-                        className="btn secondary"
-                    >
-
-                        Announcements
-
-                    </Link>
-
-                    <Link
-                        to="/admin/audit-logs"
-                        className="btn secondary"
-                    >
-
-                        Audit Logs
-
-                    </Link>
-
 
                 </div>
 
 
-            </div>
+            </section>
 
 
-            {/* =====================================
+            {/* ======================================
                 ERROR
-            ===================================== */}
+            ====================================== */}
 
             {error && (
 
-                <div className="error">
+                <div className="modern-dashboard-error">
 
-                    {error}
+                    <span>
+                        !
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Dashboard error
+                        </strong>
+
+                        <p>
+                            {error}
+                        </p>
+
+                    </div>
 
                 </div>
 
             )}
 
 
-            {/* =====================================
+            {/* ======================================
                 STATISTICS
-            ===================================== */}
+            ====================================== */}
 
-            <div className="stats-grid">
+            <section className="modern-stats-grid">
 
 
                 {/* TOTAL STUDENTS */}
 
-                <div className="stat-card">
+                <div className="modern-stat-card students-stat">
 
-                    <span>
+                    <div className="modern-stat-top">
+
+                        <div className="modern-stat-icon">
+
+                            👨‍🎓
+
+                        </div>
+
+
+                        <span className="modern-stat-badge">
+
+                            Directory
+
+                        </span>
+
+                    </div>
+
+
+                    <div className="modern-stat-number">
+
+                        {totalStudents}
+
+                    </div>
+
+
+                    <div className="modern-stat-title">
 
                         Total Students
 
-                    </span>
+                    </div>
 
 
-                    <strong>
+                    <p>
 
-                        {
-                            stats?.total_students ??
-                            stats?.students ??
-                            0
-                        }
+                        Students registered
+                        in the directory.
 
-                    </strong>
+                    </p>
 
                 </div>
 
 
                 {/* TOTAL BATCHES */}
 
-                <div className="stat-card">
+                <div className="modern-stat-card batches-stat">
 
-                    <span>
+                    <div className="modern-stat-top">
+
+                        <div className="modern-stat-icon">
+
+                            🎓
+
+                        </div>
+
+
+                        <span className="modern-stat-badge">
+
+                            Academic
+
+                        </span>
+
+                    </div>
+
+
+                    <div className="modern-stat-number">
+
+                        {totalBatches}
+
+                    </div>
+
+
+                    <div className="modern-stat-title">
 
                         Total Batches
 
-                    </span>
+                    </div>
 
 
-                    <strong>
+                    <p>
 
-                        {
-                            stats?.total_batches ??
-                            stats?.batches ??
-                            batches.length
-                        }
+                        Active academic batches
+                        available.
 
-                    </strong>
+                    </p>
 
                 </div>
 
 
                 {/* TOTAL COURSES */}
 
-                <div className="stat-card">
+                <div className="modern-stat-card courses-stat">
 
-                    <span>
+                    <div className="modern-stat-top">
+
+                        <div className="modern-stat-icon">
+
+                            📚
+
+                        </div>
+
+
+                        <span className="modern-stat-badge">
+
+                            Programs
+
+                        </span>
+
+                    </div>
+
+
+                    <div className="modern-stat-number">
+
+                        {totalCourses}
+
+                    </div>
+
+
+                    <div className="modern-stat-title">
 
                         Total Courses
 
-                    </span>
+                    </div>
 
 
-                    <strong>
+                    <p>
 
-                        {
-                            stats?.total_courses ??
-                            stats?.courses ??
-                            0
-                        }
+                        Courses currently
+                        managed.
 
-                    </strong>
+                    </p>
 
                 </div>
 
 
-            </div>
+            </section>
 
 
-            {/* =====================================
-                QUICK ACTIONS
-            ===================================== */}
+            {/* ======================================
+                MANAGEMENT SECTION
+            ====================================== */}
 
-            <section className="dashboard-section">
+            <section className="modern-dashboard-section">
 
 
-                <div className="section-heading">
-
+                <div className="modern-section-header">
 
                     <div>
 
-                        <span className="eyebrow">
+                        <span className="modern-eyebrow">
 
-                            QUICK ACTIONS
+                            MANAGEMENT
 
                         </span>
 
@@ -450,32 +513,44 @@ function AdminDashboard() {
 
                         </h2>
 
-                    </div>
 
+                        <p>
+
+                            Quickly access the most
+                            important administration tools.
+
+                        </p>
+
+                    </div>
 
                 </div>
 
 
-                <div className="quick-actions">
+                <div className="modern-management-grid">
 
 
-                    {/* =================================
-                        STUDENTS
-                    ================================= */}
+                    {/* STUDENTS */}
 
                     <Link
                         to="/admin/students"
-                        className="quick-action-card"
+                        className="modern-management-card"
                     >
 
-                        <div className="quick-action-icon">
+                        <div className="management-card-icon students-icon">
 
                             👨‍🎓
 
                         </div>
 
 
-                        <div>
+                        <div className="management-card-content">
+
+                            <span className="management-card-label">
+
+                                DIRECTORY
+
+                            </span>
+
 
                             <h3>
 
@@ -486,40 +561,49 @@ function AdminDashboard() {
 
                             <p>
 
-                                Add, edit, delete
-                                and search students.
+                                Add, edit, delete and
+                                search student records.
 
                             </p>
 
+
+                            <span className="management-card-link">
+
+                                Manage Students
+
+                                <span>
+                                    →
+                                </span>
+
+                            </span>
+
                         </div>
-
-
-                        <span className="quick-action-arrow">
-
-                            →
-
-                        </span>
 
                     </Link>
 
 
-                    {/* =================================
-                        BATCHES
-                    ================================= */}
+                    {/* BATCHES */}
 
                     <Link
                         to="/admin/batches"
-                        className="quick-action-card"
+                        className="modern-management-card"
                     >
 
-                        <div className="quick-action-icon">
+                        <div className="management-card-icon batches-icon">
 
                             📚
 
                         </div>
 
 
-                        <div>
+                        <div className="management-card-content">
+
+                            <span className="management-card-label">
+
+                                ACADEMICS
+
+                            </span>
+
 
                             <h3>
 
@@ -530,44 +614,205 @@ function AdminDashboard() {
 
                             <p>
 
-                                Manage courses,
-                                batches and durations.
+                                Manage courses, batches,
+                                durations and students.
 
                             </p>
+
+
+                            <span className="management-card-link">
+
+                                Manage Batches
+
+                                <span>
+                                    →
+                                </span>
+
+                            </span>
+
+                        </div>
+
+                    </Link>
+
+
+                    {/* EVENTS */}
+
+                    <Link
+                        to="/admin/events"
+                        className="modern-management-card"
+                    >
+
+                        <div className="management-card-icon events-icon">
+
+                            📅
 
                         </div>
 
 
-                        <span className="quick-action-arrow">
+                        <div className="management-card-content">
 
-                            →
+                            <span className="management-card-label">
 
-                        </span>
+                                ACTIVITIES
+
+                            </span>
+
+
+                            <h3>
+
+                                Events
+
+                            </h3>
+
+
+                            <p>
+
+                                Create and manage
+                                university events.
+
+                            </p>
+
+
+                            <span className="management-card-link">
+
+                                Manage Events
+
+                                <span>
+                                    →
+                                </span>
+
+                            </span>
+
+                        </div>
+
+                    </Link>
+
+
+                    {/* ANNOUNCEMENTS */}
+
+                    <Link
+                        to="/admin/announcements"
+                        className="modern-management-card"
+                    >
+
+                        <div className="management-card-icon announcements-icon">
+
+                            📢
+
+                        </div>
+
+
+                        <div className="management-card-content">
+
+                            <span className="management-card-label">
+
+                                COMMUNICATION
+
+                            </span>
+
+
+                            <h3>
+
+                                Announcements
+
+                            </h3>
+
+
+                            <p>
+
+                                Publish important information
+                                for students.
+
+                            </p>
+
+
+                            <span className="management-card-link">
+
+                                Manage Announcements
+
+                                <span>
+                                    →
+                                </span>
+
+                            </span>
+
+                        </div>
+
+                    </Link>
+
+
+                    {/* AUDIT LOGS */}
+
+                    <Link
+                        to="/admin/audit-logs"
+                        className="modern-management-card"
+                    >
+
+                        <div className="management-card-icon audit-icon">
+
+                            🛡️
+
+                        </div>
+
+
+                        <div className="management-card-content">
+
+                            <span className="management-card-label">
+
+                                SECURITY
+
+                            </span>
+
+
+                            <h3>
+
+                                Audit Logs
+
+                            </h3>
+
+
+                            <p>
+
+                                Review administrative
+                                activity and system changes.
+
+                            </p>
+
+
+                            <span className="management-card-link">
+
+                                View Audit Logs
+
+                                <span>
+                                    →
+                                </span>
+
+                            </span>
+
+                        </div>
 
                     </Link>
 
 
                 </div>
 
-
             </section>
 
 
-            {/* =====================================
-                ALL BATCHES
-            ===================================== */}
+            {/* ======================================
+                BATCHES SECTION
+            ====================================== */}
 
-            <section className="dashboard-section">
+            <section className="modern-dashboard-section">
 
 
-                <div className="section-heading">
-
+                <div className="modern-section-header batch-section-header">
 
                     <div>
 
-                        <span className="eyebrow">
+                        <span className="modern-eyebrow">
 
-                            BATCHES
+                            ACADEMIC STRUCTURE
 
                         </span>
 
@@ -578,29 +823,46 @@ function AdminDashboard() {
 
                         </h2>
 
+
+                        <p>
+
+                            Overview of the batches
+                            currently in your directory.
+
+                        </p>
+
                     </div>
 
 
                     <Link
                         to="/admin/batches"
-                        className="section-link"
+                        className="modern-view-all"
                     >
 
-                        Manage All →
+                        View all batches
+
+                        <span>
+                            →
+                        </span>
 
                     </Link>
-
 
                 </div>
 
 
-                {/* =================================
+                {/* ==================================
                     NO BATCHES
-                ================================= */}
+                ================================== */}
 
                 {batches.length === 0 ? (
 
-                    <div className="empty">
+                    <div className="modern-empty-state">
+
+                        <div className="modern-empty-icon">
+
+                            📚
+
+                        </div>
 
 
                         <h3>
@@ -612,160 +874,170 @@ function AdminDashboard() {
 
                         <p>
 
-                            Create your first batch
-                            from Manage Batches.
+                            Create your first academic
+                            batch to get started.
 
                         </p>
 
 
                         <Link
                             to="/admin/batches"
-                            className="btn primary"
+                            className="modern-primary-button"
                         >
 
-                            Add Batch
+                            Add First Batch
 
                         </Link>
-
 
                     </div>
 
                 ) : (
 
 
-                    /* =================================
-                       BATCH GRID
-                    ================================= */
-
-                    <div className="batch-grid">
+                    <div className="modern-batch-grid">
 
 
                         {batches.map(
-                            (batch) => {
+                            (batch) => (
+
+                                <article
+                                    className="modern-batch-card"
+                                    key={
+                                        batch.id
+                                    }
+                                >
 
 
-                                return (
-
-                                    <div
-                                        className="batch-card"
-                                        key={
-                                            batch.id
-                                        }
-                                    >
+                                    <div className="modern-batch-header">
 
 
-                                        {/* ==============================
-                                            BATCH YEAR
-                                        ============================== */}
-
-                                        <span className="batch-year">
+                                        <div className="modern-batch-year">
 
                                             {
+
                                                 batch.batch_year ??
                                                 batch.admission_year ??
                                                 "—"
+
                                             }
 
-                                        </span>
+                                        </div>
 
 
-                                        {/* ==============================
-                                            COURSE
-                                        ============================== */}
+                                        <div className="modern-batch-menu">
+
+                                            •••
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div className="modern-batch-main">
+
 
                                         <h3>
 
                                             {
+
                                                 batch.course_name ||
                                                 batch.course ||
                                                 "Unknown Course"
+
                                             }
 
                                         </h3>
 
 
-                                        {/* ==============================
-                                            BATCH NAME
-                                        ============================== */}
-
                                         <p>
 
                                             {
+
                                                 batch.batch_name ||
                                                 "Unnamed Batch"
+
                                             }
 
                                         </p>
 
+                                    </div>
 
-                                        {/* ==============================
-                                            BATCH FOOTER
-                                        ============================== */}
 
-                                        <div className="batch-footer">
+                                    <div className="modern-batch-divider"></div>
 
+
+                                    <div className="modern-batch-meta">
+
+
+                                        <div>
 
                                             <span>
+                                                DURATION
+                                            </span>
 
-                                                Duration:
-
-                                                {" "}
+                                            <strong>
 
                                                 {
+
                                                     batch.duration_years ??
                                                     "—"
+
                                                 }
 
                                                 {" "}
 
                                                 years
 
-                                            </span>
-
-
-                                            <span>
-
-                                                {
-                                                    batch.student_count ??
-                                                    0
-                                                }
-
-                                                {" "}
-
-                                                students
-
-                                            </span>
-
+                                            </strong>
 
                                         </div>
 
 
-                                        {/* ==============================
-                                            VIEW BATCH
-                                        ============================== */}
+                                        <div>
 
-                                        <Link
-                                            to={`/admin/batches/${batch.id}`}
-                                            className="btn secondary"
-                                        >
+                                            <span>
+                                                STUDENTS
+                                            </span>
 
-                                            View Batch →
+                                            <strong>
 
-                                        </Link>
+                                                {
 
+                                                    batch.student_count ??
+                                                    0
+
+                                                }
+
+                                            </strong>
+
+                                        </div>
 
                                     </div>
 
-                                );
 
-                            }
+                                    <Link
+                                        to={`/admin/batches/${batch.id}`}
+                                        className="modern-batch-button"
+                                    >
+
+                                        View Batch
+
+                                        <span>
+                                            →
+                                        </span>
+
+                                    </Link>
+
+
+                                </article>
+
+                            )
                         )}
 
 
                     </div>
 
                 )}
-
 
             </section>
 

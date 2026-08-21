@@ -8,40 +8,32 @@ const controller =
     require("../controllers/communityController");
 
 const {
-    requireAuth,
-    requireAdmin,
     optionalAuth
 } = require("../middleware/authMiddleware");
 
-
-const router =
-    express.Router();
+const router = express.Router();
 
 
 // =========================================================
 // UPLOAD DIRECTORY
 // =========================================================
 
-const uploadDirectory =
-    path.join(
-        __dirname,
-        "..",
-        "uploads",
-        "community"
-    );
+const uploadDirectory = path.join(
+    __dirname,
+    "..",
+    "uploads",
+    "community"
+);
 
 
-if (
-    !fs.existsSync(uploadDirectory)
-) {
+// =========================================================
+// CREATE DIRECTORY
+// =========================================================
 
-    fs.mkdirSync(
-        uploadDirectory,
-        {
-            recursive: true
-        }
-    );
-
+if (!fs.existsSync(uploadDirectory)) {
+    fs.mkdirSync(uploadDirectory, {
+        recursive: true
+    });
 }
 
 
@@ -49,175 +41,160 @@ if (
 // MULTER STORAGE
 // =========================================================
 
-const storage =
-    multer.diskStorage({
+const storage = multer.diskStorage({
 
-        destination: function (
-            req,
-            file,
-            cb
-        ) {
+    destination: function (req, file, cb) {
 
-            cb(
-                null,
-                uploadDirectory
-            );
+        cb(
+            null,
+            uploadDirectory
+        );
 
-        },
+    },
 
+    filename: function (req, file, cb) {
 
-        filename: function (
-            req,
-            file,
-            cb
-        ) {
+        const extension =
+            path.extname(
+                file.originalname
+            ).toLowerCase();
 
-            const extension =
-                path.extname(
-                    file.originalname
+        const baseName =
+            path
+                .basename(
+                    file.originalname,
+                    extension
+                )
+                .replace(
+                    /[^a-zA-Z0-9_-]/g,
+                    "_"
                 );
 
+        const uniqueName =
+            `${Date.now()}-${Math.round(
+                Math.random() * 1000000000
+            )}-${baseName}${extension}`;
 
-            const baseName =
-                path
-                    .basename(
-                        file.originalname,
-                        extension
-                    )
-                    .replace(
-                        /[^a-zA-Z0-9_-]/g,
-                        "_"
-                    );
+        cb(
+            null,
+            uniqueName
+        );
 
+    }
 
-            const uniqueName =
-                `${Date.now()}-${Math.round(
-                    Math.random() * 1000000000
-                )}-${baseName}${extension}`;
-
-
-            cb(
-                null,
-                uniqueName
-            );
-
-        }
-
-    });
+});
 
 
 // =========================================================
 // ALLOWED FILE TYPES
 // =========================================================
 
-const allowedMimeTypes =
-    new Set([
+const allowedMimeTypes = new Set([
 
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp",
+    // Images
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
 
-        "application/pdf",
+    // PDF
+    "application/pdf",
 
-        "text/plain",
+    // Text
+    "text/plain",
 
-        "application/msword",
+    // Word
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    // Excel
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 
-        "application/vnd.ms-excel",
+    // ZIP
+    "application/zip",
+    "application/x-zip-compressed"
 
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-
-        "application/zip",
-
-        "application/x-zip-compressed"
-
-    ]);
+]);
 
 
 // =========================================================
-// MULTER UPLOAD
+// MULTER
 // =========================================================
 
-const communityUpload =
-    multer({
+const communityUpload = multer({
 
-        storage,
+    storage,
 
-        limits: {
+    limits: {
 
-            fileSize:
-                10 * 1024 * 1024,
+        fileSize:
+            10 * 1024 * 1024,
 
-            files: 1
+        files: 1
 
-        },
+    },
 
-        fileFilter: function (
-            req,
-            file,
-            cb
+    fileFilter: function (
+        req,
+        file,
+        cb
+    ) {
+
+        console.log(
+            "======================================"
+        );
+
+        console.log(
+            "COMMUNITY FILE RECEIVED"
+        );
+
+        console.log(
+            "Original name:",
+            file.originalname
+        );
+
+        console.log(
+            "MIME:",
+            file.mimetype
+        );
+
+        console.log(
+            "Field name:",
+            file.fieldname
+        );
+
+        console.log(
+            "======================================"
+        );
+
+
+        if (
+            allowedMimeTypes.has(
+                file.mimetype
+            )
         ) {
 
-            console.log(
-                "======================================"
-            );
-
-            console.log(
-                "COMMUNITY FILE RECEIVED"
-            );
-
-            console.log(
-                "Original name:",
-                file.originalname
-            );
-
-            console.log(
-                "MIME:",
-                file.mimetype
-            );
-
-            console.log(
-                "Field name:",
-                file.fieldname
-            );
-
-            console.log(
-                "======================================"
-            );
-
-
-            if (
-                allowedMimeTypes.has(
-                    file.mimetype
-                )
-            ) {
-
-                return cb(
-                    null,
-                    true
-                );
-
-            }
-
-
             return cb(
-
-                new Error(
-                    "This file type is not allowed. Please upload an image, PDF, TXT, DOC, DOCX, XLS, XLSX, or ZIP file."
-                )
-
+                null,
+                true
             );
 
         }
 
-    });
+        return cb(
+            new Error(
+                "This file type is not allowed. Please upload an image, PDF, TXT, DOC, DOCX, XLS, XLSX, or ZIP file."
+            )
+        );
+
+    }
+
+});
 
 
 // =========================================================
-// MESSAGE RATE LIMIT
+// RATE LIMIT
 // =========================================================
 
 const messageLimiter =
@@ -236,30 +213,25 @@ const messageLimiter =
             false,
 
         message: {
-
             message:
                 "Too many community messages. Please try again later."
-
         }
 
     });
 
 
 // =========================================================
-// GET MESSAGES
+// GET COMMUNITY MESSAGES
 // =========================================================
 
 router.get(
-
     "/messages",
-
     controller.getMessages
-
 );
 
 
 // =========================================================
-// CREATE MESSAGE
+// CREATE COMMUNITY MESSAGE
 // =========================================================
 
 router.post(
@@ -277,21 +249,15 @@ router.post(
         communityUpload.single(
             "file"
         )(
-
             req,
-
             res,
-
             function (
                 error
             ) {
 
                 if (!error) {
-
                     return next();
-
                 }
-
 
                 console.error(
                     "COMMUNITY MULTER ERROR:",
@@ -353,7 +319,6 @@ router.post(
                 });
 
             }
-
         );
 
     },
@@ -366,15 +331,6 @@ router.post(
 // =========================================================
 // EDIT MESSAGE
 // =========================================================
-//
-// PATCH /community/messages/:id
-//
-// IMPORTANT:
-// This fixes:
-//
-// "Message editing is not enabled on the server yet."
-//
-// =========================================================
 
 router.patch(
     "/messages/:id",
@@ -384,7 +340,7 @@ router.patch(
 
 
 // =========================================================
-// DELETE MESSAGE — ADMIN
+// DELETE MESSAGE
 // =========================================================
 
 router.delete(
@@ -398,5 +354,4 @@ router.delete(
 // EXPORT
 // =========================================================
 
-module.exports =
-router;
+module.exports = router;
