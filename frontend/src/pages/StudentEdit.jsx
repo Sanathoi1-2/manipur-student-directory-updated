@@ -60,6 +60,16 @@ function StudentEdit() {
         setBatches
     ] = useState([]);
 
+    const [
+        imageFile,
+        setImageFile
+    ] = useState(null);
+
+    const [
+        imagePreview,
+        setImagePreview
+    ] = useState("");
+
 
     // ==========================================
     // FORM
@@ -94,9 +104,7 @@ function StudentEdit() {
 
         expected_graduation_year: "",
 
-        profile_image: "",
-
-        bio: ""
+        profile_image: ""
 
     });
 
@@ -352,12 +360,12 @@ function StudentEdit() {
                         : "",
 
                 profile_image:
-                    student.profile_image || "",
-
-                bio:
-                    student.bio || ""
+                    student.profile_image || ""
 
             });
+
+            setImageFile(null);
+            setImagePreview(getImageUrl(student.profile_image));
 
 
         } catch (error) {
@@ -602,6 +610,51 @@ function StudentEdit() {
 
     }
 
+
+    // ==========================================
+    // PROFILE IMAGE URL
+    // ==========================================
+
+    function getImageUrl(filePath) {
+        if (!filePath) return "";
+        if (/^https?:\\/\\//i.test(filePath)) return filePath;
+
+        const base =
+            (api.defaults?.baseURL || "")
+                .replace(/\\/api\\/?$/, "")
+                .replace(/\\/$/, "");
+
+        return `${base}/${String(filePath).replace(/^\\//, "")}`;
+    }
+
+    function handleImageChange(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (!["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type)) {
+            setError("Only JPG, JPEG, PNG and WEBP images are allowed.");
+            event.target.value = "";
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            setError("Profile image must be smaller than 5 MB.");
+            event.target.value = "";
+            return;
+        }
+
+        if (imagePreview?.startsWith("blob:")) {
+            URL.revokeObjectURL(imagePreview);
+        }
+
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
+        setForm(previous => ({
+            ...previous,
+            profile_image: ""
+        }));
+        setError("");
+    }
 
     // ==========================================
     // HANDLE INPUT
@@ -1121,17 +1174,7 @@ function StudentEdit() {
                     : null,
 
             expected_graduation_year:
-                graduationYear,
-
-            profile_image:
-                form.profile_image
-                    .trim() ||
-                null,
-
-            bio:
-                form.bio
-                    .trim() ||
-                null
+                graduationYear
 
         };
 
@@ -1151,13 +1194,22 @@ function StudentEdit() {
             setSaving(true);
 
 
+            const studentData = new FormData();
+
+            Object.entries(updateData).forEach(([key, value]) => {
+                if (value !== null && value !== undefined) {
+                    studentData.append(key, String(value));
+                }
+            });
+
+            if (imageFile) {
+                studentData.append("profile_image", imageFile);
+            }
+
             const response =
                 await api.put(
-
                     `/students/${id}`,
-
-                    updateData
-
+                    studentData
                 );
 
 
@@ -1179,7 +1231,7 @@ function StudentEdit() {
             setTimeout(() => {
 
                 navigate(
-                    `/students/${id}`
+                    `/admin/students/${id}`
                 );
 
             }, 800);
@@ -1957,59 +2009,45 @@ function StudentEdit() {
                         <div className="form-group">
 
                             <label htmlFor="profile_image">
-
-                                Profile Image URL
-
+                                Profile Image
                             </label>
-
 
                             <input
                                 id="profile_image"
                                 name="profile_image"
-                                type="text"
-                                value={
-                                    form.profile_image
-                                }
-                                onChange={
-                                    handleChange
-                                }
-                                placeholder="https://..."
+                                type="file"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                onChange={handleImageChange}
+                                disabled={saving}
                             />
 
-                        </div>
+                            <small>
+                                JPG, JPEG, PNG or WEBP. Maximum 5 MB.
+                            </small>
 
-
-                        {/* BIO */}
-
-                        <div className="form-group">
-
-                            <label htmlFor="bio">
-
-                                Bio
-
-                            </label>
-
-
-                            <textarea
-                                id="bio"
-                                name="bio"
-                                value={
-                                    form.bio
-                                }
-                                onChange={
-                                    handleChange
-                                }
-                                rows="5"
-                                placeholder="Student information..."
-                            />
+                            {imagePreview && (
+                                <div className="image-preview" style={{ marginTop: "10px" }}>
+                                    <img
+                                        src={imagePreview}
+                                        alt="Student profile preview"
+                                        style={{
+                                            width: "140px",
+                                            height: "140px",
+                                            objectFit: "cover",
+                                            borderRadius: "12px",
+                                            border: "1px solid #ddd"
+                                        }}
+                                    />
+                                </div>
+                            )}
 
                         </div>
-
 
                     </div>
 
 
                     {/* ==================================
+                        ACTIONS
                         ACTIONS
                     ================================== */}
 

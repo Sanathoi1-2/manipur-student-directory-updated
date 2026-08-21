@@ -5,6 +5,7 @@ import {
 
 import {
     Link,
+    useNavigate,
     useParams
 } from "react-router-dom";
 
@@ -18,7 +19,12 @@ function StudentDetails() {
     // ==========================================
 
     const { id } = useParams();
-// ==========================================
+
+    const navigate =
+        useNavigate();
+
+
+    // ==========================================
     // STATES
     // ==========================================
 
@@ -38,7 +44,32 @@ function StudentDetails() {
         error,
         setError
     ] = useState("");
-// ==========================================
+
+
+    const [
+        deleting,
+        setDeleting
+    ] = useState(false);
+
+
+    // ==========================================
+    // PROFILE IMAGE URL
+    // ==========================================
+
+    function getImageUrl(filePath) {
+        if (!filePath) return "";
+        if (/^https?:\\/\\//i.test(filePath)) return filePath;
+
+        const base =
+            (api.defaults?.baseURL || "")
+                .replace(/\\/api\\/?$/, "")
+                .replace(/\\/$/, "");
+
+        return `${base}/${String(filePath).replace(/^\\//, "")}`;
+    }
+
+
+    // ==========================================
     // LOAD STUDENT
     // ==========================================
 
@@ -141,6 +172,81 @@ function StudentDetails() {
 
 
     // ==========================================
+    // DELETE STUDENT
+    // ==========================================
+
+    async function handleDelete() {
+
+        if (!student) {
+
+            return;
+
+        }
+
+
+        const confirmed =
+            window.confirm(
+
+                `Are you sure you want to delete ${student.full_name}?`
+
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            setDeleting(true);
+
+            setError("");
+
+
+            await api.delete(
+                `/students/${student.id}`
+            );
+
+
+            alert(
+                "Student deleted successfully."
+            );
+
+
+            navigate(
+                "/admin/students"
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Delete student error:",
+                error
+            );
+
+
+            setError(
+
+                error.response?.data?.message ||
+
+                "Unable to delete student."
+
+            );
+
+        } finally {
+
+            setDeleting(false);
+
+        }
+
+    }
+
+
+    // ==========================================
     // LOADING
     // ==========================================
 
@@ -190,11 +296,11 @@ function StudentDetails() {
 
 
                 <Link
-                    to="/"
+                    to="/admin/students"
                     className="btn secondary"
                 >
 
-                    ← Back
+                    ← Back to Students
 
                 </Link>
 
@@ -224,18 +330,18 @@ function StudentDetails() {
                 <div>
 
                     <Link
-                        to="/"
+                        to="/admin/students"
                         className="public-back-link"
                     >
 
-                        ← Back
+                        ← Back to Students
 
                     </Link>
 
 
                     <span className="eyebrow">
 
-                        STUDENT PROFILE
+                        ADMIN / STUDENT PROFILE
 
                     </span>
 
@@ -249,11 +355,60 @@ function StudentDetails() {
 
                     <p>
 
-                        View complete student information and academic details.
+                        View complete student
+                        information and academic details.
 
                     </p>
 
                 </div>
+
+
+                {/* ==================================
+                    ADMIN ACTIONS
+                ================================== */}
+
+                <div className="student-header-actions">
+
+
+                    {/* EDIT */}
+
+                    <Link
+                        to={`/admin/students/edit/${student.id}`}
+                        className="btn primary"
+                    >
+
+                        ✏️ Edit Student
+
+                    </Link>
+
+
+                    {/* DELETE */}
+
+                    <button
+                        type="button"
+                        className="btn danger"
+                        onClick={
+                            handleDelete
+                        }
+                        disabled={
+                            deleting
+                        }
+                    >
+
+                        {deleting
+
+                            ? "Deleting..."
+
+                            : "Delete Student"
+
+                        }
+
+                    </button>
+
+
+                </div>
+
+
             </div>
 
 
@@ -859,6 +1014,36 @@ function StudentDetails() {
             </section>
 
 
+            {/* ======================================
+                BOTTOM ACTIONS
+            ====================================== */}
+
+            <div className="student-bottom-actions">
+
+
+                <Link
+                    to="/admin/students"
+                    className="btn secondary"
+                >
+
+                    ← Back to Students
+
+                </Link>
+
+
+                <Link
+                    to={`/admin/students/edit/${student.id}`}
+                    className="btn primary"
+                >
+
+                    ✏️ Edit Student
+
+                </Link>
+
+
+            </div>
+
+
         </main>
 
     );
@@ -866,21 +1051,4 @@ function StudentDetails() {
 }
 
 
-export default StudentDetails    // ==========================================
-    // PROFILE IMAGE URL
-    // ==========================================
-
-    function getImageUrl(filePath) {
-        if (!filePath) return "";
-        if (/^https?:\/\//i.test(filePath)) return filePath;
-
-        const base =
-            (api.defaults?.baseURL || "")
-                .replace(/\/api\/?$/, "")
-                .replace(/\/$/, "");
-
-        return `${base}/${String(filePath).replace(/^\//, "")}`;
-    }
-
-
-;
+export default StudentDetails;

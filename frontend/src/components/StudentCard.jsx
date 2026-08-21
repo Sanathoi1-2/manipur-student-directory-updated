@@ -7,6 +7,18 @@ function StudentCard({
     student
 }) {
 
+    function getImageUrl(filePath) {
+        if (!filePath) return "";
+        if (/^https?:\/\//i.test(filePath)) return filePath;
+
+        const base =
+            (import.meta.env.VITE_API_URL || "http://localhost:5000/api")
+                .replace(/\/api\/?$/, "")
+                .replace(/\/$/, "");
+
+        return `${base}/${String(filePath).replace(/^\//, "")}`;
+    }
+
     return (
 
         <Link
@@ -25,7 +37,7 @@ function StudentCard({
                     {student.profile_image ? (
 
                         <img
-                            src={student.profile_image}
+                            src={getImageUrl(student.profile_image)}
                             alt={student.full_name}
                         />
 

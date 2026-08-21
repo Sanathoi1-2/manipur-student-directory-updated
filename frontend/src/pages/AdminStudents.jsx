@@ -121,8 +121,6 @@ function AdminStudents() {
 
         profile_image: "",
 
-        bio: ""
-
     });
 
 
@@ -892,8 +890,6 @@ function AdminStudents() {
 
             profile_image: "",
 
-            bio: ""
-
         });
 
 
@@ -977,8 +973,6 @@ function AdminStudents() {
             expected_graduation_year: "",
 
             profile_image: "",
-
-            bio: ""
 
         });
 
@@ -1097,9 +1091,6 @@ function AdminStudents() {
 
             profile_image:
                 student.profile_image || "",
-
-            bio:
-                student.bio || ""
 
         });
 
@@ -1493,12 +1484,6 @@ function AdminStudents() {
             graduationYear !== null
                 ? String(graduationYear)
                 : ""
-        );
-
-
-        studentData.append(
-            "bio",
-            form.bio.trim() || ""
         );
 
 
@@ -2465,25 +2450,7 @@ function AdminStudents() {
                             </label>
 
 
-                            {/* BIO */}
 
-                            <label className="full-width">
-
-                                Bio
-
-                                <textarea
-                                    name="bio"
-                                    value={
-                                        form.bio
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                    rows="4"
-                                    placeholder="Student information..."
-                                />
-
-                            </label>
 
 
                         </div>
@@ -2778,7 +2745,7 @@ function AdminStudents() {
                                                     {/* VIEW */}
 
                                                     <Link
-                                                        to={`/students/${student.id}`}
+                                                        to={`/admin/students/${student.id}`}
                                                         className="view-btn"
                                                     >
 

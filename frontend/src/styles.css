@@ -993,26 +993,6 @@ nav a:hover::after {
     word-break: break-word;
 }
 
-.bio {
-    margin-top: 32px;
-
-    padding-top: 28px;
-
-    border-top:
-        1px solid var(--border-light);
-}
-
-.bio span {
-    color: var(--light-muted);
-
-    font-size: 12px;
-}
-
-.bio p {
-    color: #5f687b;
-
-    line-height: 1.7;
-}
 
 
 /* =========================================================
@@ -3110,35 +3090,6 @@ tbody tr:hover {
 }
 
 
-/* =========================================================
-   BIO
-========================================================= */
-
-.student-bio-card {
-    padding: 20px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #fafbff,
-            #f8f9fc
-        );
-
-    border:
-        1px solid #edf0f3;
-
-    border-radius: 14px;
-}
-
-.student-bio-card p {
-    margin: 0;
-
-    color: #4b5563;
-
-    font-size: 14px;
-
-    line-height: 1.8;
-}
 
 
 /* =========================================================

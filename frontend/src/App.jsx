@@ -18,6 +18,7 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
 import Home from "./pages/Home";
 import StudentDetails from "./pages/StudentDetails";
+import AdminStudentDetails from "./pages/AdminStudentDetails";
 import PublicBatches from "./pages/PublicBatches";
 import PublicBatchDetails from "./pages/PublicBatchDetails";
 import Courses from "./pages/Courses";
@@ -198,6 +199,20 @@ function App() {
                     element={
                         <ProtectedAdminRoute>
                             <AdminStudents />
+                        </ProtectedAdminRoute>
+                    }
+                />
+
+
+                {/* =================================================
+                    ADMIN STUDENT PROFILE
+                ================================================= */}
+
+                <Route
+                    path="/admin/students/:id"
+                    element={
+                        <ProtectedAdminRoute>
+                            <AdminStudentDetails />
                         </ProtectedAdminRoute>
                     }
                 />

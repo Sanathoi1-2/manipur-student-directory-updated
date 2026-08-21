@@ -9,7 +9,8 @@ const controller =
 
 const {
     requireAuth,
-    requireAdmin
+    requireAdmin,
+    optionalAuth
 } = require("../middleware/authMiddleware");
 
 
@@ -376,11 +377,9 @@ router.post(
 // =========================================================
 
 router.patch(
-
     "/messages/:id",
-
+    optionalAuth,
     controller.editMessage
-
 );
 
 
@@ -389,15 +388,9 @@ router.patch(
 // =========================================================
 
 router.delete(
-
     "/messages/:id",
-
-    requireAuth,
-
-    requireAdmin,
-
+    optionalAuth,
     controller.deleteMessage
-
 );
 
 

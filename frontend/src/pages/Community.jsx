@@ -40,12 +40,31 @@ const channels = [
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
+function getCommunityClientId() {
+    const key = "community_client_id";
+    let id = localStorage.getItem(key);
+
+    if (!id) {
+        id =
+            typeof crypto !== "undefined" && crypto.randomUUID
+                ? crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+
+        localStorage.setItem(key, id);
+    }
+
+    return id;
+}
+
 
 // =====================================================
 // COMMUNITY
 // =====================================================
 
 function Community() {
+
+    const communityClientId = getCommunityClientId();
+
 
     const [channel, setChannel] =
         useState("general");
@@ -797,7 +816,8 @@ function Community() {
                 await api.patch(
                     `/community/messages/${editingMessage.id}`,
                     {
-                        message: cleanText
+                        message: cleanText,
+                        client_id: communityClientId
                     }
                 );
 
@@ -932,6 +952,11 @@ function Community() {
                     : ""
             );
 
+            formData.append(
+                "client_id",
+                communityClientId
+            );
+
 
             // =================================================
             // REPLY DATA
@@ -951,42 +976,6 @@ function Community() {
                     String(
                         replyingTo.id
                     )
-                );
-
-
-                formData.append(
-                    "reply_to_name",
-                    replyingTo.display_name ||
-                    ""
-                );
-
-
-                formData.append(
-                    "reply_to_message",
-                    replyingTo.message ||
-                    ""
-                );
-
-
-                formData.append(
-                    "reply_to_file_name",
-                    replyingTo.file_name ||
-                    ""
-                );
-
-
-                formData.append(
-                    "reply_to_file_mime",
-                    replyingTo.file_mime ||
-                    ""
-                );
-
-
-                formData.append(
-                    "reply_to_file_url",
-                    replyingTo.file_url ||
-                    replyingTo.file_path ||
-                    ""
                 );
 
             }
@@ -1120,7 +1109,12 @@ function Community() {
 
 
             await api.delete(
-                `/community/messages/${messageId}`
+                `/community/messages/${messageId}`,
+                {
+                    data: {
+                        client_id: communityClientId
+                    }
+                }
             );
 
 
@@ -2010,6 +2004,10 @@ function Community() {
                                         const reply =
                                             getReplyData(item);
 
+                                        const canManageMessage =
+                                            isAdmin ||
+                                            item.client_id === communityClientId;
+
                                         return (
 
                                             <article
@@ -2104,7 +2102,7 @@ function Community() {
                                                         </button>
 
 
-                                                        {isAdmin && (
+                                                        {canManageMessage && (
 
                                                             <button
                                                                 type="button"
@@ -2125,7 +2123,7 @@ function Community() {
                                                         )}
 
 
-                                                        {isAdmin && (
+                                                        {canManageMessage && (
 
                                                             <button
                                                                 type="button"

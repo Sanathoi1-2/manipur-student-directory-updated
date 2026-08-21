@@ -1,5 +1,17 @@
 const { getDB, nextId } = require("../config/db");
 const { logAudit } = require("./auditController");
+const fs = require("fs");
+const path = require("path");
+
+function removeStudentImage(filePath) {
+    if (!filePath || !String(filePath).startsWith("/uploads/students/")) return;
+    try {
+        const fullPath = path.join(__dirname, "..", String(filePath).replace(/^\/+/, ""));
+        if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+    } catch (error) {
+        console.error("STUDENT IMAGE DELETE ERROR:", error.message);
+    }
+}
 
 function createAcademicYears(durationYears) {
     const duration = Number(durationYears);
@@ -128,7 +140,7 @@ async function createStudent(req, res) {
             batch_id: Number(data.batch_id), admission_year: admissionYear, current_year: Number(data.current_year),
             semester: data.semester ? Number(data.semester) : null,
             expected_graduation_year: data.expected_graduation_year ? Number(data.expected_graduation_year) : null,
-            profile_image: profileImage, bio: clean(data.bio) || null, created_at: new Date(), updated_at: new Date()
+            profile_image: profileImage, created_at: new Date(), updated_at: new Date()
         };
         await db.collection("students").insertOne(doc);
         await logAudit(req, "CREATE", "student", id, `Created student: ${doc.full_name}`);
@@ -163,9 +175,14 @@ async function updateStudent(req, res) {
             batch_id: Number(data.batch_id), admission_year: admissionYear, current_year: Number(data.current_year),
             semester: data.semester ? Number(data.semester) : null,
             expected_graduation_year: data.expected_graduation_year ? Number(data.expected_graduation_year) : null,
-            bio: clean(data.bio) || null, updated_at: new Date()
+            updated_at: new Date()
         };
-        if (req.file) updates.profile_image = `/uploads/students/${req.file.filename}`;
+        if (req.file) {
+            updates.profile_image = `/uploads/students/${req.file.filename}`;
+            if (existing.profile_image && existing.profile_image !== updates.profile_image) {
+                removeStudentImage(existing.profile_image);
+            }
+        }
         await db.collection("students").updateOne({ id: studentId }, { $set: updates });
         await logAudit(req, "UPDATE", "student", studentId, `Updated student: ${updates.full_name}`);
         res.json({ message: "Student updated successfully." });
@@ -183,6 +200,7 @@ async function deleteStudent(req, res) {
         const student = await db.collection("students").findOne({ id: studentId });
         if (!student) return res.status(404).json({ message: "Student not found." });
         await db.collection("students").deleteOne({ id: studentId });
+        removeStudentImage(student.profile_image);
         await logAudit(req, "DELETE", "student", studentId, `Deleted student: ${student.full_name}`);
         res.json({ message: "Student deleted successfully." });
     } catch (error) {

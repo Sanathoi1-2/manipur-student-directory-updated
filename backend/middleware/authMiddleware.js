@@ -135,11 +135,46 @@ function requireAdmin(req, res, next) {
 }
 
 
+
+// ==========================================
+// OPTIONAL AUTHENTICATION
+// ==========================================
+// Used by community messages so a logged-in
+// admin can manage any message, while normal
+// community users can manage only their own
+// messages using their community client ID.
+// ==========================================
+
+function optionalAuth(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return next();
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    if (!token || !process.env.JWT_SECRET) {
+        return next();
+    }
+
+    try {
+        req.user = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (_) {
+        // Invalid optional token is treated as anonymous.
+        // Protected admin routes still use requireAuth.
+        req.user = null;
+    }
+
+    next();
+}
+
 // ==========================================
 // EXPORT
 // ==========================================
 
 module.exports = {
     requireAuth,
-    requireAdmin
+    requireAdmin,
+    optionalAuth
 };
