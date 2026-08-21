@@ -50,11 +50,12 @@ const app = express();
 // http://localhost:5173
 // http://localhost:5174
 //
-// Production frontend:
-// https://manipur-student-directory-updated-1.vercel.app
+// Vercel:
+// https://manipur-student-directory-updated-*.vercel.app
 //
 // IMPORTANT:
-// If your Vercel URL changes, add the new URL here.
+// This allows your Vercel preview/deployment URLs
+// without needing to change CLIENT_URL every time.
 // ==========================================
 
 const allowedOrigins = [
@@ -65,14 +66,7 @@ const allowedOrigins = [
 
     "http://localhost:5173",
 
-    "http://localhost:5174",
-
-
-    // ==========================================
-    // PRODUCTION - VERCEL
-    // ==========================================
-
-    "https://manipur-student-directory-updated-1.vercel.app"
+    "http://localhost:5174"
 
 ];
 
@@ -111,7 +105,7 @@ app.use(
 
 
             // ==========================================
-            // ALLOWED ORIGIN
+            // ALLOW LOCALHOST
             // ==========================================
 
             if (
@@ -119,6 +113,46 @@ app.use(
                     origin
                 )
             ) {
+
+                return callback(
+                    null,
+                    true
+                );
+
+            }
+
+
+            // ==========================================
+            // ALLOW VERCEL DEPLOYMENTS
+            // ==========================================
+            //
+            // Example:
+            //
+            // https://manipur-student-directory-updated-t.vercel.app
+            //
+            // https://manipur-student-directory-updated-83rl-8poye71d9.vercel.app
+            //
+            // https://manipur-student-directory-updated-83rl-bc61mjv0h.vercel.app
+            //
+
+            if (
+
+                origin.startsWith(
+                    "https://manipur-student-directory-updated-"
+                )
+
+                &&
+
+                origin.endsWith(
+                    ".vercel.app"
+                )
+
+            ) {
+
+                console.log(
+                    "CORS ALLOWED ORIGIN:",
+                    origin
+                );
 
                 return callback(
                     null,
@@ -203,9 +237,9 @@ app.use(
 // ROOT ROUTE
 // ==========================================
 //
-// This allows the Render URL itself to work:
+// Test:
 //
-// https://your-backend.onrender.com/
+// https://manipur-student-directory-updated-1.onrender.com/
 //
 // ==========================================
 
@@ -240,11 +274,7 @@ app.get(
 //
 // Test:
 //
-// GET /api/health
-//
-// Example:
-//
-// https://your-backend.onrender.com/api/health
+// https://manipur-student-directory-updated-1.onrender.com/api/health
 //
 // ==========================================
 
@@ -272,18 +302,11 @@ app.get(
 // AUTH
 // ==========================================
 //
-// IMPORTANT:
-//
-// There is NO express-rate-limit here.
-//
-// Admin authentication is handled by:
+// Admin authentication:
 //
 // 1. JWT login
 // 2. requireAuth
 // 3. requireAdmin
-//
-// This prevents the admin /auth/me requests
-// from causing 429 errors while navigating.
 //
 // ==========================================
 
@@ -393,7 +416,6 @@ app.use(
 //
 // IMPORTANT:
 // This MUST remain AFTER all routes.
-//
 // ==========================================
 
 app.use(
@@ -472,27 +494,90 @@ app.use(
 // START SERVER
 // ==========================================
 
-const PORT = Number(process.env.PORT || 5000);
+const PORT =
+    Number(
+        process.env.PORT || 5000
+    );
+
 
 async function startServer() {
+
     try {
+
         await getDB();
-        app.listen(PORT, "0.0.0.0", () => {
-            console.log("======================================");
-            console.log("MANIPUR STUDENT DIRECTORY BACKEND");
-            console.log("Server running on port " + PORT);
-            console.log("MongoDB database:", process.env.MONGODB_DB || "ManipurStudentDirectory");
-            console.log("Environment:", process.env.NODE_ENV || "development");
-            console.log("Root: GET /");
-            console.log("Health: GET /api/health");
-            console.log("Login: POST /api/auth/login");
-            console.log("Uploads: /uploads");
-            console.log("======================================");
-        });
-    } catch (error) {
-        console.error("Unable to connect to MongoDB:", error);
-        process.exit(1);
+
+
+        app.listen(
+
+            PORT,
+
+            "0.0.0.0",
+
+            () => {
+
+                console.log(
+                    "======================================"
+                );
+
+                console.log(
+                    "MANIPUR STUDENT DIRECTORY BACKEND"
+                );
+
+                console.log(
+                    "Server running on port " +
+                    PORT
+                );
+
+                console.log(
+                    "MongoDB database:",
+                    process.env.MONGODB_DB ||
+                    "ManipurStudentDirectory"
+                );
+
+                console.log(
+                    "Environment:",
+                    process.env.NODE_ENV ||
+                    "development"
+                );
+
+                console.log(
+                    "Root: GET /"
+                );
+
+                console.log(
+                    "Health: GET /api/health"
+                );
+
+                console.log(
+                    "Login: POST /api/auth/login"
+                );
+
+                console.log(
+                    "Uploads: /uploads"
+                );
+
+                console.log(
+                    "======================================"
+                );
+
+            }
+
+        );
+
     }
+
+    catch (error) {
+
+        console.error(
+            "Unable to connect to MongoDB:",
+            error
+        );
+
+        process.exit(1);
+
+    }
+
 }
+
 
 startServer();
