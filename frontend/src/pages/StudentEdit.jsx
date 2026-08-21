@@ -617,14 +617,14 @@ function StudentEdit() {
 
     function getImageUrl(filePath) {
         if (!filePath) return "";
-        if (/^https?:\\/\\//i.test(filePath)) return filePath;
+        if (/^https?:\/\//i.test(filePath)) return filePath;
 
         const base =
             (api.defaults?.baseURL || "")
-                .replace(/\\/api\\/?$/, "")
-                .replace(/\\/$/, "");
+                .replace(/\/api\/?$/, "")
+                .replace(/\/$/, "");
 
-        return `${base}/${String(filePath).replace(/^\\//, "")}`;
+        return `${base}/${String(filePath).replace(/^\//, "")}`;
     }
 
     function handleImageChange(event) {
